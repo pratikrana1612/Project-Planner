@@ -1,5 +1,15 @@
 class ToolTip{}
 
+
+class DOMHelper
+{
+    static moveElement(elementId,newDestinationSelector)
+    {
+        const element = document.getElementById(elementId);
+        const destinationElement = document.querySelector(newDestinationSelector);
+        destinationElement.append(element);
+    }
+}
 class ProjectItem{
     constructor(id,updateProjectListsFunction)
     {
@@ -17,7 +27,7 @@ class ProjectItem{
     {
         const projItemEle = document.getElementById(this.id);
         const switchBtn = projItemEle.querySelector('button:last-of-type');
-        switchBtn.addEventListener('click',this.updateProjectListsHandler);
+        switchBtn.addEventListener('click',this.updateProjectListsHandler.bind(null,this.id));
     }
 }
 
@@ -25,6 +35,7 @@ class ProjectList{
     projects = [];
     constructor(type)
     {
+        this.type = type;
         const prjItems = document.querySelectorAll(`#${type}-projects li`);
         // console.log(prjItems);
         for(const prjItem of prjItems){
@@ -32,13 +43,14 @@ class ProjectList{
         }
         // console.log(this.projects);
     }
-    setSwitchHandlerFunction(switchHandler)
+    setSwitchHandlerFunction(setSwitchHandlerFunction)
     {
-        this.switchHandler = switchHandler;
+        this.switchHandler = setSwitchHandlerFunction;
     }
-    addProject()
+    addProject(project)
     {
-        console.log(this);
+       this.projects.push(project);
+        DOMHelper.moveElement(project.id,`#${this.type}-projects ul`);
     }
     switchProject(projectId)
     {
