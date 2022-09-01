@@ -1,4 +1,52 @@
-class ToolTip{}
+class Component
+{
+
+    constructor(hostElementId,insertBefore = false)
+    {
+        if(hostElementId)
+        {
+            this.hostElement = document.getElementById(hostElementId);
+        } 
+        else
+        {
+            this.hostElement= document.body;
+        }
+        this.insertBefore = insertBefore;
+    }
+    remove ()
+    {
+        if(this.element)
+        {
+            this.element.remove();
+        };
+        this.cloaseNotifierHandler();
+    }
+    show()
+    {
+        // document.body.append(this.element);
+        this.hostElement.insertAdjacentElement(
+            this.insertBefore ? 'afterbegin' : 'beforeend',
+            this.element
+        )
+    }
+}
+class ToolTip extends Component{
+
+    constructor(cloaseNotifier)
+    {
+        super('active-projects',true);
+        this.cloaseNotifierHandler = cloaseNotifier;
+        this.create();
+    }
+    create()
+    {
+        const tooltipElement = document.createElement('div');
+        tooltipElement.className= 'card';
+        tooltipElement.textContent = 'Dummy!';
+        tooltipElement.addEventListener('click',this.remove);
+        this.element= tooltipElement;
+    }
+}
 
 
 class DOMHelper
@@ -17,6 +65,7 @@ class DOMHelper
     }
 }
 class ProjectItem{
+    hasActiveToolTip = false;
     constructor(id,updateProjectListsFunction,type)
     {
         this.id=id;
@@ -25,9 +74,25 @@ class ProjectItem{
         this.connectSwitchButton(type);
     }
 
+    showMoreInfoHandler()
+    {
+        if(this.hasActiveToolTip)
+        {
+            return;
+        }
+        const Tooltip = new ToolTip(() =>
+        {
+            this.hasActiveToolTip = false;
+        });
+        Tooltip.show();
+        this.hasActiveToolTip=true;
+    }
     connectMoreInfoButton()
     {
-
+        const ProjectItemElement = document.getElementById(this.id);
+        // console.log(document.getElementById(this.id));
+        const moreInfoBtn = ProjectItemElement.querySelector('button:first-of-type');
+        moreInfoBtn.addEventListener('click',this.showMoreInfoHandler);
     }
     connectSwitchButton(type)   
     {
