@@ -1,3 +1,22 @@
+class DOMHelper
+{
+    static clearEventListeners(element)
+    {
+        const clonedElement = element.cloneNode(true);
+        element.replaceWith(clonedElement);
+        return clonedElement;
+    }
+    static moveElement(elementId,newDestinationSelector)
+    {
+        const element = document.getElementById(elementId);
+        const destinationElement = document.querySelector(newDestinationSelector);
+        destinationElement.append(element);
+        element.scrollIntoView({behavior:'smooth'});
+    }
+}
+
+
+
 class Component
 {
 
@@ -19,7 +38,6 @@ class Component
         {
             this.element.remove();
         };
-        this.cloaseNotifierHandler();
     }
     show()
     {
@@ -30,40 +48,49 @@ class Component
         )
     }
 }
+
+
+
 class ToolTip extends Component{
 
-    constructor(cloaseNotifier)
+    constructor(cloaseNotifier,toolTipText,hostElementId)
     {
-        super('active-projects',true);
+        // super('active-projects',true);
+        super(hostElementId);
+        // console.log(cloaseNotifier);
         this.cloaseNotifierHandler = cloaseNotifier;
+        // console.log(this.cloaseNotifierHandler);
+        this.text = toolTipText;
         this.create();
+    }
+    closeToolTip()
+    {
+        this.remove();
+        this.cloaseNotifierHandler();
     }
     create()
     {
         const tooltipElement = document.createElement('div');
         tooltipElement.className= 'card';
-        tooltipElement.textContent = 'Dummy!';
-        tooltipElement.addEventListener('click',this.remove);
+        tooltipElement.textContent = this.text;
+        // console.log(this.hostElement.getBoundingClientRect());
+        const hostElPosLeft = this.hostElement.offsetLeft;
+        const hostElPosTop = this.hostElement.offsetTop;
+        const hostElPosHeight = this.hostElement.clientHeight;
+        const scrollFromTop = this.hostElement.parentElement.scrollTop;
+        // console.log( this.hostElement.parentElement.scrollTop);
+        const x = hostElPosLeft;
+        const y = hostElPosTop + hostElPosHeight - scrollFromTop - 10;
+        tooltipElement.style.position = 'absolute';
+        tooltipElement.style.left = x + 'px';
+        tooltipElement.style.top = y + 'px';
+        tooltipElement.addEventListener('click',this.closeToolTip.bind(this));
         this.element= tooltipElement;
     }
 }
 
 
-class DOMHelper
-{
-    static clearEventListeners(element)
-    {
-        const clonedElement = element.cloneNode(true);
-        element.replaceWith(clonedElement);
-        return clonedElement;
-    }
-    static moveElement(elementId,newDestinationSelector)
-    {
-        const element = document.getElementById(elementId);
-        const destinationElement = document.querySelector(newDestinationSelector);
-        destinationElement.append(element);
-    }
-}
+
 class ProjectItem{
     hasActiveToolTip = false;
     constructor(id,updateProjectListsFunction,type)
@@ -76,6 +103,10 @@ class ProjectItem{
 
     showMoreInfoHandler()
     {
+        const ele = document.getElementById(this.id);
+        // console.log(ele.dataset);
+        // ele.dataset.someInfo = 'test';
+        const toolTipText = ele.dataset.extraInfo;
         if(this.hasActiveToolTip)
         {
             return;
@@ -83,7 +114,7 @@ class ProjectItem{
         const Tooltip = new ToolTip(() =>
         {
             this.hasActiveToolTip = false;
-        });
+        },toolTipText,this.id);
         Tooltip.show();
         this.hasActiveToolTip=true;
     }
@@ -92,14 +123,14 @@ class ProjectItem{
         const ProjectItemElement = document.getElementById(this.id);
         // console.log(document.getElementById(this.id));
         const moreInfoBtn = ProjectItemElement.querySelector('button:first-of-type');
-        moreInfoBtn.addEventListener('click',this.showMoreInfoHandler);
+        moreInfoBtn.addEventListener('click',this.showMoreInfoHandler.bind(this));
     }
     connectSwitchButton(type)   
     {
         const projItemEle = document.getElementById(this.id);
         let switchBtn = projItemEle.querySelector('button:last-of-type');
         switchBtn = DOMHelper.clearEventListeners(switchBtn);
-        switchBtn.textContent= type==='Active'?'Finished':'Active';
+        switchBtn.textContent= type === 'active'?'Finish':'active';
         // switchBtn.addEventListener('click')
         switchBtn.addEventListener('click',this.updateProjectListsHandler.bind(null,this.id));
     }
