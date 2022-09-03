@@ -19,7 +19,6 @@ class DOMHelper
 
 class Component
 {
-
     constructor(hostElementId,insertBefore = false)
     {
         if(hostElementId)
@@ -31,11 +30,13 @@ class Component
             this.hostElement= document.body;
         }
         this.insertBefore = insertBefore;
+        // console.log(this);
     }
     remove ()
     {
         if(this.element)
         {
+            // console.log(this);
             this.element.remove();
         };
     }
@@ -46,6 +47,7 @@ class Component
             this.insertBefore ? 'afterbegin' : 'beforeend',
             this.element
         )
+        // console.log(this);
     }
 }
 
@@ -72,7 +74,13 @@ class ToolTip extends Component{
     {
         const tooltipElement = document.createElement('div');
         tooltipElement.className= 'card';
-        tooltipElement.textContent = this.text;
+        // tooltipElement.textContent = this.text;
+
+        const toolTipTemplate = document.getElementById('tooltip');
+        const toolTipBody = document.importNode(toolTipTemplate.content,true);
+        toolTipBodyl.querySelector('p').textContent = this.text;
+        tooltipElement.append(toolTipBody);
+
         // console.log(this.hostElement.getBoundingClientRect());
         const hostElPosLeft = this.hostElement.offsetLeft;
         const hostElPosTop = this.hostElement.offsetTop;
@@ -115,6 +123,7 @@ class ProjectItem{
         {
             this.hasActiveToolTip = false;
         },toolTipText,this.id);
+        console.log(Tooltip);
         Tooltip.show();
         this.hasActiveToolTip=true;
     }
@@ -181,7 +190,19 @@ class App{
         console.log(FinishedProjectsList)
         activeProjectsList.setSwitchHandlerFunction(FinishedProjectsList.addProject.bind(FinishedProjectsList));
         FinishedProjectsList.setSwitchHandlerFunction(activeProjectsList.addProject.bind(activeProjectsList));
+        document.getElementById('foooter_btn').addEventListener('click',this.startAnalytics);
+    }
+
+    static startAnalytics()
+    {
+        const sc = document.createElement('script');
+        sc.src = 'assets/scripts/Analytics.js';
+        sc.defer = true;
+        document.head.append(sc);
     }
 }
 
 App.init();
+// const sc = document.createElement('script');
+// sc.textContent = "alert('hello world')";
+// document.body.append(sc);
