@@ -78,7 +78,7 @@ class ToolTip extends Component{
 
         const toolTipTemplate = document.getElementById('tooltip');
         const toolTipBody = document.importNode(toolTipTemplate.content,true);
-        toolTipBodyl.querySelector('p').textContent = this.text;
+        toolTipBody.querySelector('p').textContent = this.text;
         tooltipElement.append(toolTipBody);
 
         // console.log(this.hostElement.getBoundingClientRect());
