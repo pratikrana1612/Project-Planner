@@ -107,6 +107,7 @@ class ProjectItem{
         this.updateProjectListsHandler = updateProjectListsFunction;
         this.connectMoreInfoButton();
         this.connectSwitchButton(type);
+        this.connetDrag();
     }
 
     showMoreInfoHandler()
@@ -133,6 +134,11 @@ class ProjectItem{
         // console.log(document.getElementById(this.id));
         const moreInfoBtn = ProjectItemElement.querySelector('button:first-of-type');
         moreInfoBtn.addEventListener('click',this.showMoreInfoHandler.bind(this));
+    }
+
+    connetDrag()
+    {
+
     }
     connectSwitchButton(type)   
     {
