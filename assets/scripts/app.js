@@ -161,7 +161,7 @@ class ProjectItem{
 
     update(updateProjectListFn,type){
         this.updateProjectListsHandler = updateProjectListFn;
-        this.connectSwitchButton();
+        this.connectSwitchButton(type);
     }
 }
 
